@@ -42,7 +42,7 @@ public class WoodCutter extends Script {
     public enum TreeInfo{
 
         TREE("Tree",  new String[]{"Lumbridge"}),
-        OAK("Oak",  new String[]{"Varock East", "Varock West", "Grand Exchange"}),
+        OAK("Oak",  new String[]{"Varock East", "Varock West"}),
         WILLOW("Willow", new String[]{"Barbarian Village", "Draynor Village"});
 
         private String treeType;
@@ -71,7 +71,6 @@ public class WoodCutter extends Script {
         LUMBRIDGE("Lumbridge", Banks.LUMBRIDGE_UPPER, new Area(3175, 3240, 3200, 3207)),
         VAROCK_EAST("Varock East", Banks.VARROCK_EAST, new Area(3239, 3373, 3273, 3358)),
         VAROCK_WEST("Varock West", Banks.VARROCK_WEST, new Area(3158, 3419, 3173, 3374)),
-        GRAND_EXCHANGE("Grand Exchange", Banks.GRAND_EXCHANGE, new Area(3141, 3485, 3187, 3449)),
         DRAYNOR("Draynor", Banks.DRAYNOR, new Area(3096, 3249, 3106, 3237)),
         BARB_VILLAGE("Barbarian Village", Banks.EDGEVILLE, new Area(3084, 3452, 3105, 3425));
 
@@ -145,11 +144,12 @@ public class WoodCutter extends Script {
 
     @Override
     public int onLoop() throws InterruptedException {
-        RS2Object tree = getObjects().closest(chopArea, treeType);
+
         if (shouldStart) {
             switch(getState()){
                 case CHOP:
-                    chopTree(tree);
+                    RS2Object tree = getObjects().closest(chopArea, treeType);
+                    if(tree != null) chopTree(tree);
                     break;
 
                 case TRAVEL_TO:
@@ -167,12 +167,12 @@ public class WoodCutter extends Script {
 
                 case DROP:
                     log("dropping everything");
-                    inventory.dropAll();
+                    inventory.dropAllExcept(item -> item.getName().endsWith(" axe"));
                     break;
 
                 case WAIT:
                     getMouse().moveOutsideScreen();
-                    sleep(1500, 500, () -> !working() && !tree.exists());
+                    sleep(1500, 500, () -> !working());
             }
         }
 
@@ -304,7 +304,7 @@ public class WoodCutter extends Script {
         log("Picked new tree!");
         tree.interact("Chop down");
         getMouse().moveRandomly();
-        sleep(5000, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)) || !tree.exists());
+        sleep(5000, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)));
 
     }
 
