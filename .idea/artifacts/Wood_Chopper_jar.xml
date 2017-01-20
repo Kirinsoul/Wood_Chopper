@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Wood Chopper:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Wood_Chopper_jar</output-path>
+    <root id="archive" name="Wood Chopper.jar">
+      <element id="module-output" name="Wood Chopper" />
+      <element id="extracted-dir" path="$USER_HOME$/Desktop/osbot.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
