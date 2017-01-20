@@ -1,0 +1,57 @@
+JFDML JFormDesigner: "6.0.0.0.71" Java: "1.8.0_112-release" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq l {space :p:32:p, par l:::p {seq l {comp lblTree:::p::p, space :::x, comp cmbTree:::p::p}, seq l {comp lblBank:::p::p, space :::x, comp cmbBank:::p::p}, comp lblMain::l:p::p, seq l {space :p:38:p, comp button1:::p:120:p}, seq {comp lblLocation:::p::p, space :::x, comp cmbLocation:::p::p}}, space ::39:x}}"
+			"$verticalGroup": "par l {seq l {space :::p, comp lblMain:::p::p, space u:::p, par l {comp lblBank:::p::p, comp cmbBank:::p::p}, space :::p, par l {comp lblTree:::p::p, comp cmbTree::l:p::p}, space :::p, par l {seq {comp lblLocation:::p::p, space :p:24:p, comp button1:::p:69:p}, comp cmbLocation:::p::p}, space ::26:x}}"
+		} ) {
+			name: "this"
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblMain"
+				"text": "Wood Cutting !"
+				"font": new java.awt.Font( "Segoe UI", 1, 28 )
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblBank"
+				"text": "Bank?"
+				"font": &Font0 new java.awt.Font( "Segoe UI", 0, 20 )
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "cmbBank"
+				"model": new javax.swing.DefaultComboBoxModel {
+					selectedItem: "YES"
+					addElement( "YES" )
+					addElement( "NO" )
+				}
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "button1"
+				"text": "START"
+				"font": new java.awt.Font( "Segoe UI", 1, 20 )
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "button1ActionPerformed", true ) )
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblTree"
+				"text": "Tree"
+				"font": #Font0
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "lblLocation"
+				"text": "Location"
+				"font": #Font0
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "cmbLocation"
+			} )
+			add( new FormComponent( "javax.swing.JComboBox" ) {
+				name: "cmbTree"
+				addEvent( new FormEvent( "java.awt.event.ItemListener", "itemStateChanged", "cmbTreeItemStateChanged", true ) )
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 0, 0 )
+			"size": new java.awt.Dimension( 275, 300 )
+		} )
+	}
+}
