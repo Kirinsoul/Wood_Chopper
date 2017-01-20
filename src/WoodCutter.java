@@ -23,8 +23,8 @@ public class WoodCutter extends Script {
     //VARIABLES//
     ////////////
     private final Area[] BANKS = {Banks.LUMBRIDGE_UPPER, Banks.VARROCK_EAST, Banks.VARROCK_WEST, Banks.EDGEVILLE, Banks.GRAND_EXCHANGE, Banks.DRAYNOR};
-    private final Area LUM_TREES = new Area(3176, 3238, 3200, 3207);
-    private final Area LUM_BANK = Banks.LUMBRIDGE_UPPER;
+    //private final Area LUM_TREES = new Area(3176, 3238, 3200, 3207);
+    //private final Area LUM_BANK = Banks.LUMBRIDGE_UPPER;
     private String treeType;
     private Area chopArea;
     private Area bankArea;
@@ -42,7 +42,7 @@ public class WoodCutter extends Script {
     public enum TreeInfo{
 
         TREE("Tree",  new String[]{"Lumbridge"}),
-        OAK("Oak",  new String[]{"Varock East", "Varock West"}),
+        OAK("Oak",  new String[]{"Varock East", "Varock West", "Grand Exchange"}),
         WILLOW("Willow", new String[]{"Barbarian Village", "Draynor Village"});
 
         private String treeType;
@@ -145,10 +145,10 @@ public class WoodCutter extends Script {
 
     @Override
     public int onLoop() throws InterruptedException {
+        RS2Object tree = getObjects().closest(chopArea, treeType);
         if (shouldStart) {
             switch(getState()){
                 case CHOP:
-                    RS2Object tree = getObjects().closest(LUM_TREES,"Tree");
                     chopTree(tree);
                     break;
 
@@ -162,7 +162,7 @@ public class WoodCutter extends Script {
                     break;
 
                 case TRAVEL_BACK:
-                    walking.webWalk(LUM_TREES);
+                    walking.webWalk(chopArea);
                     break;
 
                 case DROP:
@@ -172,7 +172,7 @@ public class WoodCutter extends Script {
 
                 case WAIT:
                     getMouse().moveOutsideScreen();
-                    sleep(1500, 500, () -> !working());
+                    sleep(1500, 500, () -> !working() && !tree.exists());
             }
         }
 
@@ -264,13 +264,13 @@ public class WoodCutter extends Script {
         Usage: get the current state of the player
      */
     private State getState(){
-        RS2Object tree = getObjects().closest(LUM_TREES,"Tree");
+        RS2Object tree = getObjects().closest(chopArea,"Tree");
         if (shouldBank) {
-            if(inventory.isFull() && !LUM_BANK.contains(myPlayer())){
+            if(inventory.isFull() && !bankArea.contains(myPlayer())){
                 return State.TRAVEL_TO;
-            }else if(inventory.isFull() && LUM_BANK.contains(myPlayer())){
+            }else if(inventory.isFull() && bankArea.contains(myPlayer())){
                 return State.BANK;
-            }else if(!LUM_TREES.contains(myPlayer())){
+            }else if(!chopArea.contains(myPlayer())){
                 return State.TRAVEL_BACK;
             }else if(tree != null && !working()){
                 return State.CHOP;
@@ -330,7 +330,7 @@ public class WoodCutter extends Script {
             getBank().open();
             sleep(3000, 500, () -> getBank().isOpen());
         }else{
-            getBank().depositAll();
+            getBank().depositAllExcept(item -> item.getName().endsWith(" axe"));
 
         }
 

@@ -31,9 +31,9 @@ public class GuiMain extends JFrame {
     private void button1ActionPerformed(ActionEvent e) throws  NullPointerException{
 
         script.setShouldBank(cmbBank.getSelectedItem().toString().equalsIgnoreCase("yes"));  //set should bank
-        script.setTreeChop(cmbTree.getSelectedItem().toString());
-        script.setChopArea(script.getChopArea(cmbLocation.getSelectedItem().toString()));
-        script.setBankArea(script.getBankArea(cmbLocation.getSelectedItem().toString()));
+        script.setTreeChop(cmbTree.getSelectedItem().toString()); //set tree type
+        script.setChopArea(script.getChopArea(cmbLocation.getSelectedItem().toString())); //set location
+        script.setBankArea(script.getBankArea(cmbLocation.getSelectedItem().toString())); //set bank location
         script.setShouldStart(true); //start script
         this.setVisible(false); //dispose of form
     }
