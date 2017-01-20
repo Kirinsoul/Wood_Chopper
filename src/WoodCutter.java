@@ -22,9 +22,13 @@ public class WoodCutter extends Script {
     /////////////
     //VARIABLES//
     ////////////
-
+    private final Area[] BANKS = {Banks.LUMBRIDGE_UPPER, Banks.VARROCK_EAST, Banks.VARROCK_WEST, Banks.EDGEVILLE, Banks.GRAND_EXCHANGE, Banks.DRAYNOR};
     private final Area LUM_TREES = new Area(3176, 3238, 3200, 3207);
     private final Area LUM_BANK = Banks.LUMBRIDGE_UPPER;
+    private String treeType;
+    private Area chopArea;
+    private Area bankArea;
+
 
     private boolean shouldStart = false; //start script after button press
     private boolean shouldBank = true; //should script bank
@@ -37,14 +41,14 @@ public class WoodCutter extends Script {
     //tree info for GUI
     public enum TreeInfo{
 
-        TREE("Tree",  "Lumbridge"),
-        OAK("Oak",  "Varock East", "Varock West"),
-        WILLOW("Willow", "Barbarian Village", "Draynor Village");
+        TREE("Tree",  new String[]{"Lumbridge"}),
+        OAK("Oak",  new String[]{"Varock East", "Varock West"}),
+        WILLOW("Willow", new String[]{"Barbarian Village", "Draynor Village"});
 
         private String treeType;
         private String[] treeLocation;
 
-        TreeInfo(String s, String ... l){
+        TreeInfo(String s, String[] l){
 
             treeType = s;
             treeLocation = l;
@@ -61,26 +65,69 @@ public class WoodCutter extends Script {
 
     }
 
+
+    public enum AreaInfo{
+
+        LUMBRIDGE("Lumbridge", Banks.LUMBRIDGE_UPPER, new Area(3175, 3240, 3200, 3207)),
+        VAROCK_EAST("Varock East", Banks.VARROCK_EAST, new Area(3239, 3373, 3273, 3358)),
+        VAROCK_WEST("Varock West", Banks.VARROCK_WEST, new Area(3158, 3419, 3173, 3374)),
+        GRAND_EXCHANGE("Grand Exchange", Banks.GRAND_EXCHANGE, new Area(3141, 3485, 3187, 3449)),
+        DRAYNOR("Draynor", Banks.DRAYNOR, new Area(3096, 3249, 3106, 3237)),
+        BARB_VILLAGE("Barbarian Village", Banks.EDGEVILLE, new Area(3084, 3452, 3105, 3425));
+
+        private String location;
+        private Area bankArea;
+        private Area choppingArea;
+
+        AreaInfo(String l, Area a, Area b){
+            location = l;
+            bankArea = a;
+            choppingArea = b;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public Area getBankArea() {
+            return bankArea;
+        }
+
+        public Area getChoppingArea() {
+            return choppingArea;
+        }
+    }
+
+
+
     /////////////
     //ACCESSORS//
     ////////////
 
-    public boolean getShouldBank() {
-        return shouldBank;
-    }
 
     ////////////
     //MUTATORS//
     ///////////
 
-    public void setShouldStart(boolean shouldStart) {
+    void setShouldStart(boolean shouldStart) {
         this.shouldStart = shouldStart;
     }
 
-    public void setShouldBank(boolean shouldBank) {
+    void setShouldBank(boolean shouldBank) {
         this.shouldBank = shouldBank;
     }
 
+    void setTreeChop(String treeChop) {
+        this.treeType = treeChop;
+    }
+
+    void setChopArea(Area chopArea) {
+        this.chopArea = chopArea;
+    }
+
+    void setBankArea(Area bankArea) {
+        this.bankArea = bankArea;
+    }
 
     //////////////////////
     // REQUIRED METHODS //
@@ -106,7 +153,7 @@ public class WoodCutter extends Script {
                     break;
 
                 case TRAVEL_TO:
-                    walking.webWalk(LUM_BANK);
+                    getWalking().webWalk(BANKS);
                     break;
 
                 case BANK:
@@ -184,6 +231,24 @@ public class WoodCutter extends Script {
             l.add(t.getTreeType());
         }
         return Arrays.copyOf(l.toArray(), l.toArray().length, String[].class);
+    }
+
+    public Area getChopArea(String c){
+        for (AreaInfo a : AreaInfo.values()){
+            if(a.getLocation().equalsIgnoreCase(c)){
+                return a.getChoppingArea();
+            }
+        }
+        return null;
+    }
+
+    public Area getBankArea(String c){
+        for (AreaInfo a : AreaInfo.values()){
+            if(a.getLocation().equalsIgnoreCase(c)){
+                return a.getBankArea();
+            }
+        }
+        return null;
     }
 
     private String formatTime(final long ms){

@@ -4,8 +4,8 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
-			"$horizontalGroup": "par l {seq l {space :p:32:p, par l:::p {seq l {comp lblTree:::p::p, space :::x, comp cmbTree:::p::p}, seq l {comp lblBank:::p::p, space :::x, comp cmbBank:::p::p}, comp lblMain::l:p::p, seq l {space :p:38:p, comp button1:::p:120:p}, seq {comp lblLocation:::p::p, space :::x, comp cmbLocation:::p::p}}, space ::39:x}}"
-			"$verticalGroup": "par l {seq l {space :::p, comp lblMain:::p::p, space u:::p, par l {comp lblBank:::p::p, comp cmbBank:::p::p}, space :::p, par l {comp lblTree:::p::p, comp cmbTree::l:p::p}, space :::p, par l {seq {comp lblLocation:::p::p, space :p:24:p, comp button1:::p:69:p}, comp cmbLocation:::p::p}, space ::26:x}}"
+			"$horizontalGroup": "par l {seq l {space :p:32:p, par l {seq l {par l {comp lblMain::l:p::p, seq l {space :p:38:p, comp button1:::p:120:p}}, space ::84:x}, seq t {par t {seq t {comp lblLocation:::p::p, space ::109:x, comp cmbLocation:::p::p}, seq {comp lblTree:::p::p, space ::147:x, comp cmbTree:::p::p}, seq {comp lblBank:::p::p, space ::147:x, comp cmbBank:::p::p}}, space :p:39:p}}}}"
+			"$verticalGroup": "par l {seq l {space :::p, comp lblMain:::p::p, space u:::p, par t {comp lblBank:::p::p, comp cmbBank:::p::p}, space :::p, par l {comp lblTree:::p::p, comp cmbTree::t:p::p}, space u:::p, par l {comp lblLocation:::p::p, comp cmbLocation:::p::p}, space :p:24:p, comp button1:::p:69:p, space ::20:x}}"
 		} ) {
 			name: "this"
 			add( new FormComponent( "javax.swing.JLabel" ) {
@@ -51,7 +51,7 @@ new FormModel {
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 275, 300 )
+			"size": new java.awt.Dimension( 320, 300 )
 		} )
 	}
 }
