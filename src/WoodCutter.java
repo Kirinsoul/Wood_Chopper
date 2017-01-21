@@ -22,7 +22,7 @@ public class WoodCutter extends Script {
     /////////////
     //VARIABLES//
     ////////////
-    private final Area[] BANKS = {Banks.LUMBRIDGE_UPPER, Banks.VARROCK_EAST, Banks.VARROCK_WEST, Banks.EDGEVILLE, Banks.GRAND_EXCHANGE, Banks.DRAYNOR};
+    //private final Area[] BANKS = {Banks.LUMBRIDGE_UPPER, Banks.VARROCK_EAST, Banks.VARROCK_WEST, Banks.EDGEVILLE, Banks.GRAND_EXCHANGE, Banks.DRAYNOR};
     //private final Area LUM_TREES = new Area(3176, 3238, 3200, 3207);
     //private final Area LUM_BANK = Banks.LUMBRIDGE_UPPER;
     private String treeType;
@@ -71,7 +71,7 @@ public class WoodCutter extends Script {
         LUMBRIDGE("Lumbridge", Banks.LUMBRIDGE_UPPER, new Area(3175, 3240, 3200, 3207)),
         VAROCK_EAST("Varock East", Banks.VARROCK_EAST, new Area(3239, 3373, 3273, 3358)),
         VAROCK_WEST("Varock West", Banks.VARROCK_WEST, new Area(3158, 3419, 3173, 3374)),
-        DRAYNOR("Draynor", Banks.DRAYNOR, new Area(3096, 3249, 3106, 3237)),
+        DRAYNOR("Draynor Village", Banks.DRAYNOR, new Area(3078, 3243, 3092, 3226)),
         BARB_VILLAGE("Barbarian Village", Banks.EDGEVILLE, new Area(3084, 3452, 3105, 3425));
 
         private String location;
@@ -137,7 +137,6 @@ public class WoodCutter extends Script {
     public void onStart() {
         GuiMain gui = new GuiMain(this);
         gui.setVisible(true);
-        getExperienceTracker().start(Skill.WOODCUTTING);
         log("Script is starting!");
 
     }
@@ -146,18 +145,20 @@ public class WoodCutter extends Script {
     public int onLoop() throws InterruptedException {
 
         if (shouldStart) {
+
             switch(getState()){
                 case CHOP:
                     RS2Object tree = getObjects().closest(chopArea, treeType);
-                    if(tree != null) chopTree(tree);
+                    getCamera().toEntity(tree);
+                    if(tree != null ) chopTree(tree);
                     break;
 
                 case TRAVEL_TO:
-                    getWalking().webWalk(BANKS);
+                    getWalking().webWalk(bankArea);
                     break;
 
                 case BANK:
-                    log("depositing all");
+                    log("depositing");
                     depositBank();
                     break;
 
@@ -172,11 +173,12 @@ public class WoodCutter extends Script {
 
                 case WAIT:
                     getMouse().moveOutsideScreen();
-                    sleep(1500, 500, () -> !working());
+                    sleep(300, 89, () -> working());
+
             }
         }
 
-        return random(200, 300);
+        return random(50, 300);
     }
 
     @Override
@@ -304,7 +306,7 @@ public class WoodCutter extends Script {
         log("Picked new tree!");
         tree.interact("Chop down");
         getMouse().moveRandomly();
-        sleep(5000, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)));
+        sleep(2667, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)));
 
     }
 

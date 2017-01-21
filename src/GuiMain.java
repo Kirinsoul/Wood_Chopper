@@ -1,3 +1,5 @@
+import org.osbot.rs07.api.ui.Skill;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -36,6 +38,7 @@ public class GuiMain extends JFrame {
         script.setBankArea(script.getBankArea(cmbLocation.getSelectedItem().toString())); //set bank location
         script.setShouldStart(true); //start script
         this.setVisible(false); //dispose of form
+        script.getExperienceTracker().start(Skill.WOODCUTTING);
     }
 
     /*
