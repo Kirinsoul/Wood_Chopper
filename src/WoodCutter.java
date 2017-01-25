@@ -43,7 +43,7 @@ public class WoodCutter extends Script {
 
         TREE("Tree",  new String[]{"Lumbridge"}),
         OAK("Oak",  new String[]{"Varock East", "Varock West"}),
-        WILLOW("Willow", new String[]{"Barbarian Village", "Draynor Village"});
+        WILLOW("Willow", new String[]{"Draynor Village"});
 
         private String treeType;
         private String[] treeLocation;
@@ -70,9 +70,8 @@ public class WoodCutter extends Script {
 
         LUMBRIDGE("Lumbridge", Banks.LUMBRIDGE_UPPER, new Area(3175, 3240, 3200, 3207)),
         VAROCK_EAST("Varock East", Banks.VARROCK_EAST, new Area(3239, 3373, 3273, 3358)),
-        VAROCK_WEST("Varock West", Banks.VARROCK_WEST, new Area(3158, 3419, 3173, 3374)),
-        DRAYNOR("Draynor Village", Banks.DRAYNOR, new Area(3078, 3243, 3092, 3226)),
-        BARB_VILLAGE("Barbarian Village", Banks.EDGEVILLE, new Area(3084, 3452, 3105, 3425));
+        VAROCK_WEST("Varock West", Banks.VARROCK_WEST, new Area(3157, 3397, 3172, 3363)),
+        DRAYNOR("Draynor Village", Banks.DRAYNOR, new Area(3078, 3243, 3092, 3226));
 
         private String location;
         private Area bankArea;
@@ -203,7 +202,7 @@ public class WoodCutter extends Script {
         g.setFont(normal);
 
         g.drawString("LRDBLK's Wood Cutter !", 8, 30);
-        g.drawString("Time Elapsed: " + formatTime(experienceTracker.getElapsed(Skill.WOODCUTTING)), 8, 45);
+        g.drawString("Time Elapsed: " + Timing.msToString(experienceTracker.getElapsed(Skill.WOODCUTTING)), 8, 45);
         g.drawString("Woodcutting Exp Gained: " + experienceTracker.getGainedXP(Skill.WOODCUTTING), 8, 60);
         g.setFont(italic);
         g.drawString(this.getState().toString(), 8, 90);
@@ -218,6 +217,10 @@ public class WoodCutter extends Script {
     // CUSTOM METHODS //
     //////////////////////
 
+    /*
+       Enter a tree name
+       Returns the location of that tree
+     */
     public String[] findTreeLocation(String s){
         for (TreeInfo t : TreeInfo.values()){
             if(t.getTreeType().contains(s)){
@@ -227,6 +230,9 @@ public class WoodCutter extends Script {
         return null;
     }
 
+    /*
+        Returns a String array of all tree names
+     */
     public String[] getTrees(){
         LinkedList l = new LinkedList();
         for(TreeInfo t : TreeInfo.values()){
@@ -234,6 +240,11 @@ public class WoodCutter extends Script {
         }
         return Arrays.copyOf(l.toArray(), l.toArray().length, String[].class);
     }
+
+    /*
+        Enter a location
+        Returns: the area where the trees are for that location
+     */
 
     public Area getChopArea(String c){
         for (AreaInfo a : AreaInfo.values()){
@@ -244,6 +255,11 @@ public class WoodCutter extends Script {
         return null;
     }
 
+    /*
+        Enter the location
+        Returns the bank for that area
+     */
+
     public Area getBankArea(String c){
         for (AreaInfo a : AreaInfo.values()){
             if(a.getLocation().equalsIgnoreCase(c)){
@@ -252,6 +268,10 @@ public class WoodCutter extends Script {
         }
         return null;
     }
+
+    /*
+        Formats a time in ms
+     */
 
     private String formatTime(final long ms){
         long s = ms / 1000, m = s / 60, h = m / 60, d = h / 24;
@@ -306,7 +326,9 @@ public class WoodCutter extends Script {
         log("Picked new tree!");
         tree.interact("Chop down");
         getMouse().moveRandomly();
-        sleep(2667, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)));
+        Timing.waitCondition(() -> gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)
+                || !tree.exists(), 3000);
+        //sleep(2667, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)));
 
     }
 
