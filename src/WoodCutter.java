@@ -4,16 +4,20 @@
 
 import org.osbot.rs07.api.map.Area;
 import org.osbot.rs07.api.map.constants.Banks;
+import org.osbot.rs07.api.model.Entity;
 import org.osbot.rs07.api.model.RS2Object;
 import org.osbot.rs07.api.ui.Skill;
 import org.osbot.rs07.script.Script;
 import org.osbot.rs07.script.ScriptManifest;
-import org.osbot.rs07.utility.ConditionalSleep;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.lang.Math.toIntExact;
 
 
 @ScriptManifest(author = "LRDBLK", info = "Chops wood", name = "Wood Chopper", version = 1, logo = "")
@@ -28,8 +32,7 @@ public class WoodCutter extends Script {
     private String treeType;
     private Area chopArea;
     private Area bankArea;
-
-
+    private java.util.List<RS2Object> tree;
     private boolean shouldStart = false; //start script after button press
     private boolean shouldBank = true; //should script bank
 
@@ -96,6 +99,22 @@ public class WoodCutter extends Script {
         }
     }
 
+    private Predicate<RS2Object> suitableTree = tree ->
+            tree != null &&
+            chopArea.contains(tree) &&
+            tree.hasAction("Chop down") &&
+            peopleAroundEntity(tree, 2) <= 3;
+
+    private Predicate<RS2Object> secondBestTree = tree ->
+            tree != null &&
+            chopArea.contains(tree) &&
+            tree.hasAction("Chop down") ;
+
+    private int peopleAroundEntity (Entity e, int areaSize){
+        return toIntExact(players.getAll().stream().filter(x -> e.getArea(areaSize).contains(x)).count());
+    }
+
+
 
 
     /////////////
@@ -147,9 +166,29 @@ public class WoodCutter extends Script {
 
             switch(getState()){
                 case CHOP:
-                    RS2Object tree = getObjects().closest(chopArea, treeType);
-                    getCamera().toEntity(tree);
-                    if(tree != null ) chopTree(tree);
+                    tree = getObjects().getAll().stream().filter(suitableTree).collect(Collectors.toList());
+                    if (tree != null){
+                        tree.sort(Comparator.<RS2Object>comparingInt(a -> getMap().realDistance(a))
+                                .thenComparingInt(b -> getMap().realDistance(b)));
+                        log("Currently Chopping: " + tree.get(0).getName());
+                        log(" Amount of players around tree: "+ peopleAroundEntity(tree.get(0), 2));
+                        if (tree.get(0).interact("Chop down")){
+                            Timing.waitCondition(() -> !working(), 2000);
+                        }
+                    }else{
+                        log("Trees have a lot of players around, consider using another world");
+                        tree = getObjects().getAll().stream().filter(secondBestTree).collect(Collectors.toList());
+                        tree.sort(Comparator.<RS2Object>comparingInt(a -> peopleAroundEntity(a, 2))
+                                .thenComparingInt(b -> peopleAroundEntity(b, 2)));
+                        log("Best tree has " + peopleAroundEntity(tree.get(0), 2) + " people around it");
+                        if (tree.get(0).interact("Chop down")){
+                            Timing.waitCondition(() -> !working(), 2000);
+                        }
+
+                    }
+                    //RS2Object tree = getObjects().closest(chopArea, treeType);
+                    //if(tree != null ) chopTree(tree);
+                    //getCamera().toEntity(tree);
                     break;
 
                 case TRAVEL_TO:
@@ -172,8 +211,7 @@ public class WoodCutter extends Script {
 
                 case WAIT:
                     getMouse().moveOutsideScreen();
-                    sleep(300, 89, () -> working());
-
+                    Timing.waitCondition(() -> working(), 2000);
             }
         }
 
@@ -203,7 +241,8 @@ public class WoodCutter extends Script {
 
         g.drawString("LRDBLK's Wood Cutter !", 8, 30);
         g.drawString("Time Elapsed: " + Timing.msToString(experienceTracker.getElapsed(Skill.WOODCUTTING)), 8, 45);
-        g.drawString("Woodcutting Exp Gained: " + experienceTracker.getGainedXP(Skill.WOODCUTTING), 8, 60);
+        g.drawString("Woodcutting Exp Per hour: " + experienceTracker.getGainedXPPerHour(Skill.WOODCUTTING) + "per/hour", 8, 60);
+        g.drawString("Woodcutting Levels Gained: " + getExperienceTracker().getGainedLevels(Skill.WOODCUTTING), 8, 75);
         g.setFont(italic);
         g.drawString(this.getState().toString(), 8, 90);
 
@@ -270,19 +309,6 @@ public class WoodCutter extends Script {
     }
 
     /*
-        Formats a time in ms
-     */
-
-    private String formatTime(final long ms){
-        long s = ms / 1000, m = s / 60, h = m / 60, d = h / 24;
-        s %= 60; m %= 60; h %= 24;
-
-        return d > 0 ? String.format("%02d:%02d:%02d:%02d", d, h, m, s) :
-                h > 0 ? String.format("%02d:%02d:%02d", h, m, s) :
-                        String.format("%02d:%02d", m, s);
-    }
-
-    /*
         Usage: get the current state of the player
      */
     private State getState(){
@@ -326,23 +352,11 @@ public class WoodCutter extends Script {
         log("Picked new tree!");
         tree.interact("Chop down");
         getMouse().moveRandomly();
-        Timing.waitCondition(() -> gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)
-                || !tree.exists(), 3000);
+        Timing.waitCondition(() -> !tree.exists(), 5000);
         //sleep(2667, 389, () -> (gainedXP != getExperienceTracker().getGainedXP(Skill.WOODCUTTING)));
 
     }
 
-    /*
-        Usage: sleeps for a certain amount of time using a given condition
-        Arguments: maxSleep - max sleep time, deviation - +/- time, condition - when to stop sleeping
-     */
-    private static void sleep(int maxSleep, int deviation, BooleanSupplier condition) {
-        new ConditionalSleep(maxSleep, deviation) {
-            public boolean condition() throws InterruptedException {
-                return condition.getAsBoolean();
-            }
-        }.sleep();
-    }
 
     /*
         Usage: opens bank, deposits everything
@@ -352,7 +366,7 @@ public class WoodCutter extends Script {
         log("banking!");
         if(!getBank().isOpen()){
             getBank().open();
-            sleep(3000, 500, () -> getBank().isOpen());
+            Timing.waitCondition(() -> getBank().isOpen(), 5000);
         }else{
             getBank().depositAllExcept(item -> item.getName().endsWith(" axe"));
 
